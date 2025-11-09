@@ -5,11 +5,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace ContextWorkshop
 {
     public static class MyLog
     {
+        private static Dictionary<string, string> debugInfo = new Dictionary<string, string>();
+
+        public static void SetDebugInfo(string key, string value)
+        {
+            debugInfo[key] = value;
+        }
+
+        public static Dictionary<string, string> GetDebugInfo()
+        {
+            return new Dictionary<string, string>(debugInfo);
+        }
+
         public static string UnescapeUnicode(string input)
         {
             if (string.IsNullOrEmpty(input)) return input;

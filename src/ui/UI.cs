@@ -32,28 +32,43 @@ namespace ContextWorkshop
 
         public async Task RunMainLoopAsync()
         {
-            var table = new Table();
-            table.AddColumn("ID");
-            table.AddColumn("Role");
-            table.AddColumn("Content");
-            table.AddColumn("Timestamp");
-
             while (true)
             {
                 AnsiConsole.Clear();
-                table.Rows.Clear();
 
+                // システムプロンプト表示
                 var panel = new Panel(Markup.Escape(await _context.GetSystemMessageAsync()));
                 panel.Header = new PanelHeader("System Prompt ( " + await _context.GetSystemMessageTokenCountAsync() + " Tokens )");
                 AnsiConsole.Write(panel);
 
+                // 会話履歴表示
                 var contextItems = await _context.GetContextItemsAsync();
+                var table = new Table();
+                table.Caption = new TableTitle("Conversation History");
+                table.AddColumn("ID");
+                table.AddColumn("Role");
+                table.AddColumn("Content");
+                table.AddColumn("Timestamp");
+
                 foreach (var item in contextItems)
                 {
                     table.AddRow(item.Id.ToString(), item.Role.ToString(), Markup.Escape(item.Content), item.Timestamp.ToLocalTime().ToString());
                 }
                 AnsiConsole.Write(table);
 
+                // デバッグ情報表示
+                var debugTable = new Table();
+                debugTable.Caption = new TableTitle("Debug Info");
+                debugTable.AddColumn("key");
+                debugTable.AddColumn("value");
+                var debugInfo = MyLog.GetDebugInfo();
+                foreach (var kvp in debugInfo)
+                {
+                    debugTable.AddRow(Markup.Escape(kvp.Key), Markup.Escape(kvp.Value));
+                }
+                AnsiConsole.Write(debugTable);
+
+                // ユーザープロンプト入力
                 var prompt = await AnsiConsole.PromptAsync(
                     new TextPrompt<string>("prompt: "));
 

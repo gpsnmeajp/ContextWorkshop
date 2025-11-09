@@ -189,7 +189,7 @@ namespace ContextWorkshop
                 attachmentMediaType: string.Empty,
                 tools: [],
                 onProgress: (llmResponse) =>
-                {},
+                { },
                 onComplete: async (llmResponse) =>
                 {
                     if (llmResponse.Role != Common.Role.Assistant)
@@ -216,6 +216,27 @@ namespace ContextWorkshop
                     }
                 }
             );
+
+            // 自己採点処理を実施
+            await _llm.GenerateResponseAsync(
+                prompt: "<system>会話履歴を参照し、ユーザーの最新の質問に対するあなたの回答が適切であったかを0から100のスコアで評価してください。返答はスコアのみとしてください。</system>\n",
+                systemMessage: await GetSystemMessageAsync(),
+                attachmentData: null,
+                attachmentMediaType: string.Empty,
+                tools: [],
+                onProgress: (llmResponse) =>
+                { },
+                onComplete: async (llmResponse) =>
+                {
+                    if (llmResponse.Role != Common.Role.Assistant)
+                    {
+                        return;
+                    }
+                    // 抽出結果をデバッグ情報に挿入
+                    MyLog.SetDebugInfo("Self-Evaluation Score", llmResponse.Content.Trim());
+                }
+            );
+
         }
 
         public void Dispose()
