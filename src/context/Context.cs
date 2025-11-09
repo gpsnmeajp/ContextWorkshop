@@ -157,6 +157,8 @@ namespace ContextWorkshop
             await _llm.GenerateResponseAsync(
                 prompt: userPrompt,
                 systemMessage: systemMessage,
+                attachmentData: null, // File.ReadAllBytes("assets/attachment.png"),
+                attachmentMediaType: string.Empty, // "image/png",
                 tools: await _tool.GetToolsAsync(),
                 onProgress: (llmResponse) =>
                 {
@@ -183,6 +185,8 @@ namespace ContextWorkshop
                                "もし抽出すべきファクトがない場合は、{}とだけ出力してください。\n\n" +
                                "# 今までのファクト\n" +
                                string.Join("\n", facts.Select(kvp => $"{kvp.Key}: {kvp.Value}")),
+                attachmentData: null,
+                attachmentMediaType: string.Empty,
                 tools: [],
                 onProgress: (llmResponse) =>
                 {},

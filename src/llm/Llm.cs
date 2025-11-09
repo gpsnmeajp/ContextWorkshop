@@ -44,7 +44,7 @@ namespace ContextWorkshop
         {
         }
 
-        public async Task GenerateResponseAsync(string prompt, string systemMessage, IList<AITool> tools, Action<LlmResponse> onProgress, Action<LlmResponse> onComplete)
+        public async Task GenerateResponseAsync(string prompt, string systemMessage, ReadOnlyMemory<byte>? attachmentData, string attachmentMediaType, IList<AITool> tools, Action<LlmResponse> onProgress, Action<LlmResponse> onComplete)
         {
             MyLog.LogWrite($"LLMモデル: {model}");
 
@@ -86,11 +86,21 @@ namespace ContextWorkshop
 
             MyLog.LogWrite($"システムプロンプト: {systemMessage.Length}文字");
 
+            // ユーザー入力を構築
+            List<AIContent> userContents = new List<AIContent>() { new TextContent(prompt) };
+
+            // 画像添付があるならつける(とりあえず1つだけ対応)
+            if (attachmentData.HasValue && attachmentData.Value.Length > 0 && !string.IsNullOrEmpty(attachmentMediaType))
+            {
+                userContents.Add(new DataContent(attachmentData.Value, attachmentMediaType));
+                MyLog.LogWrite($"添付ファイル付き: {attachmentMediaType}, サイズ: {attachmentData.Value.Length} バイト");
+            }
+
             // チャットメッセージを構築
             List<ChatMessage> chatMessages = new List<ChatMessage>()
             {
                 new ChatMessage(ChatRole.System, systemMessage),
-                new ChatMessage(ChatRole.User, prompt)
+                new ChatMessage(ChatRole.User, userContents)
             };
 
             MyLog.LogWrite($"生成開始...");

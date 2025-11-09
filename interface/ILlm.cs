@@ -28,6 +28,6 @@ namespace ContextWorkshop.Interface
     {
         Task InitializeAsync();
         Task ResetAsync();
-        Task GenerateResponseAsync(string prompt, string systemMessage, IList<AITool> tools, Action<LlmResponse> onProgress, Action<LlmResponse> onComplete);
+        Task GenerateResponseAsync(string prompt, string systemMessage, ReadOnlyMemory<byte>? attachmentData, string attachmentMediaType, IList<AITool> tools, Action<LlmResponse> onProgress, Action<LlmResponse> onComplete);
     }
 }
